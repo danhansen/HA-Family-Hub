@@ -7731,6 +7731,7 @@ this._screenSaverCameraInterval = null;
 }
 // The overlay lives outside this card's shadow DOM (appended straight to document.body - see _ensureScreenSaverOverlay)
 if (this._screenSaverOverlayEl) {
+window.FamilyHubPhotoMotion?.stop(this._screenSaverOverlayEl);
 this._screenSaverOverlayEl.remove();
 this._screenSaverOverlayEl = null;
 }
@@ -10668,6 +10669,7 @@ const screenSaver = {
 sourceType: screenSaverSourceType,
 videoUrl: screenSaverVideoUrl,
 cameraEntity: screenSaverCameraEntity,
+kenBurns: parsedScreenSaver.kenBurns !== false,
 idleSeconds: screenSaverIdleSeconds,
 usersEnabled: screenSaverUsersEnabled,
 disableWhileRecipeOpen: screenSaverDisableWhileRecipeOpen,
@@ -15876,6 +15878,7 @@ ${FAMILY_HUB_SHARED_STYLE_BLOCK}
 <label data-i18n="settings.camera_entity_label">Camera entity</label>
 <input type="text" class="screensaver-camera-entity-input" placeholder="camera.front_door" list="screensaver-camera-options" />
 <datalist id="screensaver-camera-options"></datalist>
+<label><input type="checkbox" class="screensaver-ken-burns-input" /> Ken Burns motion for slideshow photos</label>
 </div>
 <div class="field">
 <label data-i18n="settings.idle_time_label">Idle time before it shows</label>
@@ -20840,6 +20843,7 @@ this._updateScreenSaverSourceVisibility(screenSaver.sourceType);
 const screenSaverVideoUrlEl = root.querySelector(".screensaver-video-url-input");
 if (screenSaverVideoUrlEl) screenSaverVideoUrlEl.value = screenSaver.videoUrl || "";
 const screenSaverCameraEntityEl = root.querySelector(".screensaver-camera-entity-input");
+root.querySelector(".screensaver-ken-burns-input").checked = screenSaver.kenBurns !== false;
 if (screenSaverCameraEntityEl) screenSaverCameraEntityEl.value = screenSaver.cameraEntity || "";
 const screenSaverIdleEl = root.querySelector(".screensaver-idle-seconds-input");
 if (screenSaverIdleEl) screenSaverIdleEl.value = String(screenSaver.idleSeconds || 180);
@@ -21234,7 +21238,7 @@ videoEl.style.display = "none";
 if (imgEl) imgEl.style.display = "";
 this._updateScreenSaverCameraImage();
 if (!this._screenSaverCameraInterval) {
-this._screenSaverCameraInterval = setInterval(() => this._updateScreenSaverCameraImage(), 10000);
+this._screenSaverCameraInterval = setInterval(() => this._updateScreenSaverCameraImage(), window.FamilyHubPhotoMotion?.supports(ss, this._hass.states[ss.cameraEntity]?.attributes) ? 1000 : 10000);
 }
 } else {
 if (imgEl) imgEl.style.display = "none";
@@ -21253,6 +21257,7 @@ if (this._ssLayer) this._ssLayer.show();
 _hideScreenSaver() {
 const overlay = this._screenSaverOverlayEl;
 if (!overlay || overlay.style.display === "none") return;
+window.FamilyHubPhotoMotion?.stop(overlay);
 overlay.style.display = "none";
 const videoEl = overlay.querySelector(".screensaver-video");
 if (videoEl) videoEl.pause();
@@ -21333,6 +21338,7 @@ const entityId = ss && ss.cameraEntity;
 const state = entityId && this._hass.states[entityId];
 const picture = state && state.attributes && state.attributes.entity_picture;
 if (!picture) return;
+if (window.FamilyHubPhotoMotion?.update(overlay, ss, state, this._hass)) return;
 const sep = picture.indexOf("?") === -1 ? "?" : "&";
 imgEl.src = `${picture}${sep}fhts=${Date.now()}`;
 }
@@ -21809,6 +21815,7 @@ const screenSaver = {
 sourceType: screenSaverSourceType,
 videoUrl: screenSaverVideoUrl,
 cameraEntity: screenSaverCameraEntity,
+kenBurns: root.querySelector(".screensaver-ken-burns-input").checked,
 idleSeconds: screenSaverIdleSeconds,
 usersEnabled: screenSaverUsersEnabled,
 disableWhileRecipeOpen: screenSaverDisableWhileRecipeOpen,

@@ -18,8 +18,8 @@
     "timer",
     "todo"
   ],
-  "documentation": "https://github.com/JVarhol/HA-Family-Hub",
-  "issue_tracker": "https://github.com/JVarhol/HA-Family-Hub/issues",
+  "documentation": "https://github.com/danhansen/HA-Family-Hub",
+  "issue_tracker": "https://github.com/danhansen/HA-Family-Hub/issues",
   "iot_class": "local_polling",
-  "version": "2026.11.2.14"
+  "version": "2026.11.2.14.post1"
 }

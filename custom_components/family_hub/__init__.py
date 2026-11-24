@@ -11263,6 +11263,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         StaticPathConfig(THEME_SELECTOR_CARD_JS_URL, theme_selector_path, False),
         StaticPathConfig(TODAY_CARD_JS_URL, today_card_path, False),
         StaticPathConfig(SCREENSAVER_CARD_JS_URL, screensaver_card_path, False),
+        StaticPathConfig("/family_hub_screensaver_card/photo-motion.js", f"{integration_dir}/card/screensaver-photo-motion.js", False),
         StaticPathConfig(CHORES_CARD_JS_URL, chores_card_path, False),
         StaticPathConfig(MY_CHORES_CARD_JS_URL, my_chores_card_path, False),
         StaticPathConfig(REWARDS_CARD_JS_URL, rewards_card_path, False),
@@ -11335,6 +11336,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     _register_dashboard_resource(hass, card_url_versioned)
     _register_dashboard_resource(hass, theme_selector_url_versioned)
     _register_dashboard_resource(hass, today_card_url_versioned)
+    motion_hash = await hass.async_add_executor_job(_file_content_hash, f"{integration_dir}/card/screensaver-photo-motion.js")
+    _register_dashboard_resource(hass, f"/family_hub_screensaver_card/photo-motion.js?v={motion_hash}")
     _register_dashboard_resource(hass, screensaver_card_url_versioned)
     _register_dashboard_resource(hass, chores_card_url_versioned)
     _register_dashboard_resource(hass, my_chores_card_url_versioned)

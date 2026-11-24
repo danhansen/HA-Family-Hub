@@ -1674,6 +1674,7 @@ class FamilyScreensaverCard extends HTMLElement {
       this._screenSaverCameraInterval = null;
     }
     if (this._screenSaverOverlayEl) {
+      window.FamilyHubPhotoMotion?.stop(this._screenSaverOverlayEl);
       this._screenSaverOverlayEl.remove();
       this._screenSaverOverlayEl = null;
     }
@@ -1746,7 +1747,7 @@ class FamilyScreensaverCard extends HTMLElement {
       });
     }
     const options = window.FamilyHubScreensaver.normalizeOptions(parsedScreenSaver);
-    return { screenSaver: Object.assign({ sourceType, videoUrl, cameraEntity, idleSeconds, usersEnabled }, options), screenSaverWidgets };
+    return { screenSaver: Object.assign({ sourceType, videoUrl, cameraEntity, kenBurns: parsedScreenSaver.kenBurns !== false, idleSeconds, usersEnabled }, options), screenSaverWidgets };
   }
   // Same this-device-only localStorage key as the main calendar card's own _getScreenSaverHiddenWidgetIds - shared by name
   _getScreenSaverHiddenWidgetIds() {
@@ -2101,7 +2102,7 @@ class FamilyScreensaverCard extends HTMLElement {
       if (imgEl) imgEl.style.display = "";
       this._updateScreenSaverCameraImage();
       if (!this._screenSaverCameraInterval) {
-        this._screenSaverCameraInterval = setInterval(() => this._updateScreenSaverCameraImage(), 10000);
+        this._screenSaverCameraInterval = setInterval(() => this._updateScreenSaverCameraImage(), window.FamilyHubPhotoMotion?.supports(ss, this._hass.states[ss.cameraEntity]?.attributes) ? 1000 : 10000);
       }
     } else {
       if (imgEl) imgEl.style.display = "none";
@@ -2120,6 +2121,7 @@ class FamilyScreensaverCard extends HTMLElement {
   _hideScreenSaver() {
     const overlay = this._screenSaverOverlayEl;
     if (!overlay || overlay.style.display === "none") return;
+    window.FamilyHubPhotoMotion?.stop(overlay);
     overlay.style.display = "none";
     const videoEl = overlay.querySelector(".screensaver-video");
     if (videoEl) videoEl.pause();
@@ -2141,6 +2143,7 @@ class FamilyScreensaverCard extends HTMLElement {
     const state = entityId && this._hass.states[entityId];
     const picture = state && state.attributes && state.attributes.entity_picture;
     if (!picture) return;
+    if (window.FamilyHubPhotoMotion?.update(overlay, ss, state, this._hass)) return;
     const sep = picture.indexOf("?") === -1 ? "?" : "&";
     imgEl.src = `${picture}${sep}fhts=${Date.now()}`;
   }

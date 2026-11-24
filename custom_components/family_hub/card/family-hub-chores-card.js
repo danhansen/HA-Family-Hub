@@ -1102,7 +1102,7 @@ if (!window.__familyHubScreenSaver) {
       }
       const returnDashboardPath = normalizeDashboardPath(ss.returnDashboardPath);
       const screenSaverWidgets = normalizeScreenSaverWidgets(parsed.screenSaverWidgets);
-      return { screenSaver: { sourceType, videoUrl, cameraEntity, idleSeconds, usersEnabled, returnDashboardPath }, screenSaverWidgets };
+      return { screenSaver: { sourceType, videoUrl, cameraEntity, kenBurns: ss.kenBurns !== false, idleSeconds, usersEnabled, returnDashboardPath }, screenSaverWidgets };
     }
     function getSettings() {
       return settingsCache || defaultSettings();
@@ -1241,7 +1241,7 @@ if (!window.__familyHubScreenSaver) {
         }
         if (imgEl) imgEl.style.display = "";
         updateCameraImage();
-        if (!cameraInterval) cameraInterval = setInterval(updateCameraImage, 10000);
+        if (!cameraInterval) cameraInterval = setInterval(updateCameraImage, window.FamilyHubPhotoMotion?.supports(ss, hass.states[ss.cameraEntity]?.attributes) ? 1000 : 10000);
       } else {
         if (imgEl) imgEl.style.display = "none";
         if (videoEl) {
@@ -1258,6 +1258,7 @@ if (!window.__familyHubScreenSaver) {
     function hideScreenSaver() {
       const overlay = overlayEl;
       if (!overlay || overlay.style.display === "none") return;
+      window.FamilyHubPhotoMotion?.stop(overlay);
       overlay.style.display = "none";
       const videoEl = overlay.querySelector(".screensaver-video");
       if (videoEl) videoEl.pause();
@@ -1305,6 +1306,7 @@ if (!window.__familyHubScreenSaver) {
       const state = entityId && hass.states[entityId];
       const picture = state && state.attributes && state.attributes.entity_picture;
       if (!picture) return;
+      if (window.FamilyHubPhotoMotion?.update(overlay, ss, state, hass)) return;
       const sep = picture.indexOf("?") === -1 ? "?" : "&";
       imgEl.src = `${picture}${sep}fhts=${Date.now()}`;
     }
@@ -1343,6 +1345,7 @@ if (!window.__familyHubScreenSaver) {
         cameraInterval = null;
       }
       if (overlayEl) {
+        window.FamilyHubPhotoMotion?.stop(overlayEl);
         overlayEl.remove();
         overlayEl = null;
       }

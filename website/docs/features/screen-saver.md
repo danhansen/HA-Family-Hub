@@ -21,6 +21,15 @@ The source, idle time and widgets are shared by the whole household.
 
 The **Camera** source works with any camera entity, so the easiest way to turn the screen into a photo frame is an integration that makes a slideshow camera. We like [Album Slideshow](https://github.com/eyalgal/album_slideshow) (install it from HACS). It reads Google Photos shared albums, Immich, PhotoPrism, iCloud shared albums, Synology Photos, Nextcloud, a local or NAS folder, or a Home Assistant media source, and creates a camera that cycles through the pictures. Pick that camera as the screen saver's **Camera**, and the widgets below sit on top of your photos.
 
+### Ken Burns motion for slideshow photos
+
+With an Album Slideshow camera selected, the full-screen photo pans and zooms
+on the display and fades into the next photo. The display fetches one still
+per photo change. This also works with the camera’s server-side motion switch
+turned off. The effect defaults to on for slideshow cameras. Toggle **Ken Burns
+motion for slideshow photos** below the camera picker to change it.
+Pause slideshow holds the pan; reduced-motion and e-ink settings keep it still.
+
 ## Widgets
 
 The widgets are drawn straight onto the picture, the way a photo frame does it: big, thin type with no card around it (2026.11.1.4+).
